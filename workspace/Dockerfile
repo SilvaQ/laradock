@@ -807,11 +807,6 @@ RUN if [ ${INSTALL_YARN} = true ]; then \
   fi && \
   echo "" >> ~/.bashrc && \
   echo 'export PATH="$HOME/.yarn/bin:$PATH"' >> ~/.bashrc \
-  echo 'change registry to taobao' \
-  && yarn global add yrm \
-  && yrm ls&& \
-  && yrm use taobao \
-  && yrm ls \
   ;fi
 
 # Add YARN binaries to root's .bashrc
@@ -821,6 +816,9 @@ RUN if [ ${INSTALL_YARN} = true ]; then \
   echo "" >> ~/.bashrc && \
   echo 'export YARN_DIR="/home/laradock/.yarn"' >> ~/.bashrc && \
   echo 'export PATH="$YARN_DIR/bin:$PATH"' >> ~/.bashrc \
+  && echo 'change registry to taobao' \
+  && /home/laradock/.yarn/bin/yarn global add yrm \
+  && yrm use taobao \
   ;fi
 
 # Add PATH for YARN
