@@ -702,11 +702,20 @@ ENV NVM_DIR /home/laradock/.nvm
 ARG NVM_NODEJS_ORG_MIRROR
 ENV NVM_NODEJS_ORG_MIRROR ${NVM_NODEJS_ORG_MIRROR}
 
+USER root
+
+ENV NVM_DIR /home/laradock/.nvm
+
+RUN echo "199.232.96.133 githubusercontent.com">>/etc/hosts \
+  && echo "199.232.96.133 raw.githubusercontent.com"  >>/etc/hosts\
+  && mkdir -p $NVM_DIR  \
+  && curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash \
+  && chown laradock.laradock $NVM_DIR 
+
+USER laradock
 RUN if [ ${INSTALL_NODE} = true ]; then \
   # Install nvm (A Node Version Manager)
-  mkdir -p $NVM_DIR && \
-  curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash \
-  && . $NVM_DIR/nvm.sh \
+  . $NVM_DIR/nvm.sh \
   && nvm install ${NODE_VERSION} \
   && nvm use ${NODE_VERSION} \
   && nvm alias ${NODE_VERSION} \
@@ -816,14 +825,12 @@ RUN if [ ${INSTALL_YARN} = true ]; then \
   echo "" >> ~/.bashrc && \
   echo 'export YARN_DIR="/home/laradock/.yarn"' >> ~/.bashrc && \
   echo 'export PATH="$YARN_DIR/bin:$PATH"' >> ~/.bashrc \
-  && echo 'change registry to taobao' \
   && /home/laradock/.yarn/bin/yarn global add yrm \
   && yrm use taobao \
   ;fi
 
 # Add PATH for YARN
 ENV PATH $PATH:/home/laradock/.yarn/bin
-
 ###########################################################################
 # PHP Aerospike:
 ###########################################################################
@@ -834,7 +841,7 @@ ARG INSTALL_AEROSPIKE=false
 
 RUN set -xe; \
   if [ ${INSTALL_AEROSPIKE} = true ]; then \
-  # Fix dependencies for PHPUnit within aerospike extension
+  # Fix dependencies for PHPUnit within aerospikeclear extension
   apt-get -y install sudo wget && \
   # Install the php aerospike extension
   if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
@@ -1121,8 +1128,8 @@ ARG INSTALL_PYTHON=false
 
 RUN if [ ${INSTALL_PYTHON} = true ]; then \
   apt-get -y install python python-pip python-dev build-essential  \
-  && python -m pip install --upgrade pip  \
-  && python -m pip install --upgrade virtualenv \
+  && python -m pip install --upgrade pip -i http://pypi.douban.com/simple --trusted-host pypi.douban.com \
+  && python -m pip install --upgrade virtualenv -i http://pypi.douban.com/simple --trusted-host pypi.douban.com \
   ;fi
 
 ###########################################################################
@@ -1133,8 +1140,8 @@ ARG INSTALL_PYTHON3=false
 
 RUN if [ ${INSTALL_PYTHON3} = true ]; then \
   apt-get -y install python3 python3-pip python3-dev build-essential  \
-  && python3 -m pip install --upgrade --force-reinstall pip  \
-  && python3 -m pip install --upgrade virtualenv \
+  && python3 -m pip install --upgrade --force-reinstall pip -i http://pypi.douban.com/simple --trusted-host pypi.douban.com \
+  && python3 -m pip install --upgrade virtualenv -i http://pypi.douban.com/simple --trusted-host pypi.douban.com \
   ;fi
 
 ###########################################################################
